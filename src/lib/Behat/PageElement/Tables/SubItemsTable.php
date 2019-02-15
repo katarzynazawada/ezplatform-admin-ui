@@ -52,11 +52,11 @@ class SubItemsTable extends Table
      */
     public function clickListElement(string $name, ?string $contentType = null): void
     {
-        $elementPositionInTable = $this->getElementPositionInTable($name, $contentType);
-        while ($elementPositionInTable == 0 && $this->isShowMoreResultsActive()) {
+        do {
             $this->context->findElement($this->fields['showMoreResults'])->click();
             $elementPositionInTable = $this->getElementPositionInTable($name, $contentType);
-        }
+        } while ($elementPositionInTable == 0 && $this->isShowMoreResultsActive());
+
         Assert::assertTrue((bool) $elementPositionInTable, sprintf('There\'s no subitem %s on Sub-item list', $name));
 
         $this->context->findElement(sprintf($this->fields['nthListElement'], $elementPositionInTable))->click();
@@ -74,22 +74,38 @@ class SubItemsTable extends Table
      *
      * @return bool
      */
-    public function getElementPositionInTable(string $name, ?string $contentType = null): int
+    protected function getElementPositionInTable(string $name, ?string $contentType = null): int
     {
         if ($this->context->isElementVisible($this->fields['noItems'])) {
             return 0;
         }
-        if (strpos($this->context->findElement($this->fields['list'])->getText(), $name) !== false) {
-            $matchingListElementsPositions = $this->context->getAllElementsPositionsByText($name, $this->fields['listElement']);
-            $matchingCount = count($matchingListElementsPositions);
-            for ($i = 0; $i < $matchingCount; ++$i) {
-                if ($contentType === null || $this->context->findElement(sprintf($this->fields['listElementType'], $matchingListElementsPositions[$i]))->getText() === $contentType) {
-                    return $matchingListElementsPositions[$i];
-                }
+
+        $isElementNamePresentInTable = strpos($this->context->findElement($this->fields['list'])->getText(), $name) !== false;
+        if (!$isElementNamePresentInTable) {
+            return 0;
+        }
+
+        $matchingListElementsPositions = $this->getAllElementsPositionsByText($name, $this->fields['listElement']);
+        $matchingCount = count($matchingListElementsPositions);
+        for ($i = 0; $i < $matchingCount; ++$i) {
+            if ($contentType === null || $this->context->findElement(sprintf($this->fields['listElementType'], $matchingListElementsPositions[$i]))->getText() === $contentType) {
+                return $matchingListElementsPositions[$i];
             }
         }
 
         return 0;
+    }
+
+    /**
+     * Check if list contains link element with given name.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function isElementInTable(string $name, ?string $contentType = null): bool
+    {
+        return (bool) $this->getElementPositionInTable($name, $contentType);
     }
 
     /**

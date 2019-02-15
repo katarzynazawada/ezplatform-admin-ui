@@ -166,43 +166,6 @@ class UtilityContext extends MinkContext
     }
 
     /**
-     * Finds all HTML elements by class and the text value and returns array with their's positions in order. Search can be narrowed to children of baseElement.
-     *
-     * @param string $text Text value of the element
-     * @param string $selector CSS selector of the element
-     * @param string $textSelector Extra CSS selector for text of the element
-     * @param TraversableElement|null $baseElement
-     *
-     * @return array
-     */
-    public function getAllElementsPositionsByText(string $text, string $selector, string $textSelector = null, TraversableElement $baseElement = null): array
-    {
-        $baseElement = $baseElement ?? $this->getSession()->getPage();
-        $counter = 0;
-
-        $elementsPositions = [];
-
-        $elements = $this->findAllElements($selector, $baseElement);
-        foreach ($elements as $element) {
-            ++$counter;
-            if ($textSelector !== null) {
-                try {
-                    $elementText = $this->findElement($textSelector, 10, $element)->getText();
-                } catch (\Exception $e) {
-                    continue;
-                }
-            } else {
-                $elementText = $element->getText();
-            }
-            if ($elementText === $text) {
-                $elementsPositions[] = $counter;
-            }
-        }
-
-        return $elementsPositions;
-    }
-
-    /**
      * Waits no longer than specified timeout for the given condition to be true.
      *
      * @param int $timeoutSeconds Timeout

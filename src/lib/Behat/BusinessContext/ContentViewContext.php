@@ -81,7 +81,7 @@ class ContentViewContext extends BusinessContext
         $contentItemPage = PageObjectFactory::createPage($this->utilityContext, ContentItemPage::PAGE_NAME, $folder);
 
         Assert::assertFalse(
-            (bool) $contentItemPage->subItemList->table->getElementPositionInTable($itemName, $itemType),
+            $contentItemPage->subItemList->table->isElementInTable($itemName, $itemType),
             sprintf('%s "%s" shouldn\'t be on %s Sub-items list', $itemType, $itemName, $folder)
         );
     }
@@ -225,7 +225,7 @@ class ContentViewContext extends BusinessContext
         $contentItemPage = PageObjectFactory::createPage($this->utilityContext, ContentItemPage::PAGE_NAME, $explodedPath[$pathSize - 1]);
 
         Assert::assertTrue(
-            (bool) $contentItemPage->subItemList->table->getElementPositionInTable($contentName, $contentType),
+            $contentItemPage->subItemList->table->isElementInTable($contentName, $contentType),
             sprintf('%s "%s" shouldn\'t be on %s Sub-items list', $contentType, $contentName, $explodedPath[$pathSize - 1])
         );
     }
