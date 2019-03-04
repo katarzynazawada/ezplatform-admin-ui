@@ -52,13 +52,14 @@ class SubItemsTable extends Table
      */
     public function clickListElement(string $name, ?string $contentType = null): void
     {
-        $isElementInTable = $this->isElementInTable($name, $contentType);
+        $elementPositionInTable = $this->getElementPositionInTable($name, $contentType);
+        $isElementInTable = (bool) $elementPositionInTable;
 
         while (!$isElementInTable && $this->isShowMoreResultsActive()) {
             $this->context->findElement($this->fields['showMoreResults'])->click();
             $elementPositionInTable = $this->getElementPositionInTable($name, $contentType);
             $isElementInTable = (bool) $elementPositionInTable;
-        };
+        }
 
         Assert::assertTrue($isElementInTable, sprintf('There\'s no subitem %s on Sub-item list', $name));
 
