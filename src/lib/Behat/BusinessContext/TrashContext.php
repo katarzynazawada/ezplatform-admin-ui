@@ -6,6 +6,7 @@
  */
 namespace EzSystems\EzPlatformAdminUi\Behat\BusinessContext;
 
+use Behat\Gherkin\Node\TableNode;
 use EzSystems\EzPlatformAdminUi\Behat\PageElement\Dialog;
 use EzSystems\EzPlatformAdminUi\Behat\PageElement\ElementFactory;
 use EzSystems\EzPlatformAdminUi\Behat\PageElement\LeftMenu;
@@ -63,5 +64,23 @@ class TrashContext extends BusinessContext
 
         $trash = PageObjectFactory::createPage($this->utilityContext, TrashPage::PAGE_NAME);
         $trash->verifyIfItemInTrash($itemType, $itemName);
+    }
+
+
+    /**
+     * @When I delete item fromm trash
+     */
+    public function iDeleteItemFromTrash(TableNode $settings): void
+    {
+        $trashPage = PageObjectFactory::createPage($this->utilityContext, TrashPage::PAGE_NAME);
+        $hash = $settings->getHash();
+
+        foreach ($hash as $setting) {
+           $trashPage->adminList->table->selectListElement($setting['item']);
+        }
+
+       // $trashPage->adminList->clickTrashButton();
+       // $trashPage->dialog->verifyVisibility();
+       // $trashPage->dialog->confirm();
     }
 }
