@@ -254,6 +254,14 @@ class ContentViewContext extends BusinessContext
     }
 
     /**
+     * @Then going to root path there is :contentName :contentType on Sub-items list
+     */
+    public function goingToRootTheresSubItem(string $contentName, string $contentType): void
+    {
+        $this->goingToPathTheresSubItem(EzEnvironmentConstants::get('ROOT_CONTENT_NAME'), $contentName, $contentType);
+    }
+
+    /**
      * @When I send content to trash
      */
     public function iSendContentToTrash(): void

@@ -63,24 +63,72 @@ class TrashContext extends BusinessContext
         $leftMenu->clickButton('Trash');
 
         $trash = PageObjectFactory::createPage($this->utilityContext, TrashPage::PAGE_NAME);
-        $trash->verifyIfItemInTrash($itemType, $itemName);
+        $trash->verifyIfItemInTrash($itemType, $itemName, true);
     }
 
 
     /**
-     * @When I delete item fromm trash
+     * @When I delete item from trash list
      */
     public function iDeleteItemFromTrash(TableNode $settings): void
     {
         $trashPage = PageObjectFactory::createPage($this->utilityContext, TrashPage::PAGE_NAME);
         $hash = $settings->getHash();
 
+            foreach ($hash as $setting) {
+                $trashPage->trashTable->selectListElement($setting['item']);
+            }
+
+        $trashPage->trashTable->clickTrashButton();
+        $trashPage->dialog->verifyVisibility();
+        $trashPage->dialog->confirm();
+    }
+
+    /**
+     * @When I restore item from trash
+     */
+    public function iRestoreItemFromTrash(TableNode $settings): void
+    {
+        $trashPage = PageObjectFactory::createPage($this->utilityContext, TrashPage::PAGE_NAME);
+        $hash = $settings->getHash();
+
         foreach ($hash as $setting) {
-           $trashPage->adminList->table->selectListElement($setting['item']);
+            $trashPage->trashTable->selectListElement($setting['item']);
         }
 
-       // $trashPage->adminList->clickTrashButton();
-       // $trashPage->dialog->verifyVisibility();
-       // $trashPage->dialog->confirm();
+        $trashPage->trashTable->clickRestoreButton();
+    }
+
+    /**
+     * @When I restore item from trash under new location
+     */
+    public function iRestoreItemFromTrashUnderNewLocation(TableNode $settings): void
+    {
+        $trashPage = PageObjectFactory::createPage($this->utilityContext, TrashPage::PAGE_NAME);
+        $hash = $settings->getHash();
+
+        foreach ($hash as $setting) {
+            $trashPage->trashTable->selectListElement($setting['item']);
+        }
+
+        $trashPage->trashTable->clickRestoreUnderNewLocationButton();
+    }
+
+    /**
+     * @Then there is :itemType :itemName on trash list
+     */
+    public function thereIsItemOnTrashList(string $itemType, string $itemName): void
+    {
+        $trashPage = PageObjectFactory::createPage($this->utilityContext, TrashPage::PAGE_NAME);
+        $trashPage->verifyIfItemInTrash($itemType, $itemName,true);
+    }
+
+    /**
+     * @Then there is no :itemType :itemName on trash list
+     */
+    public function thereIsNoItemOnTrashList(string $itemType, string $itemName): void
+    {
+        $trashPage = PageObjectFactory::createPage($this->utilityContext, TrashPage::PAGE_NAME);
+        $trashPage->verifyIfItemInTrash($itemType, $itemName,false);
     }
 }

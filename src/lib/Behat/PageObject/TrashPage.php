@@ -30,11 +30,17 @@ class TrashPage extends Page
      */
     public $dialog;
 
+    /**
+     * @var \EzSystems\EzPlatformAdminUi\Behat\PageElement\Tables\TrashTable
+     */
+    public $trashTable;
+
     public function __construct(UtilityContext $context)
     {
         parent::__construct($context);
         $this->route = '/admin/trash/list';
         $this->adminList = ElementFactory::createElement($this->context, AdminList::ELEMENT_NAME, 'Trash', TrashTable::ELEMENT_NAME, $this::ITEM_RESTORE_LIST_CONTAINER);
+        $this->trashTable = ElementFactory::createElement($this->context, TrashTable::ELEMENT_NAME, $this::ITEM_RESTORE_LIST_CONTAINER);
         $this->dialog = ElementFactory::createElement($this->context, Dialog::ELEMENT_NAME);
         $this->pageTitle = 'Trash';
         $this->pageTitleLocator = '.ez-page-title h1';
@@ -48,13 +54,16 @@ class TrashPage extends Page
         $this->adminList->verifyVisibility();
     }
 
-    public function verifyIfItemInTrash(string $itemType, string $itemName): void
+    public function verifyIfItemInTrash(string $itemType, string $itemName, bool $elementShouldExist): void
     {
+        $isElementInTrash = $this->isTrashEmpty() ||
+            !$this->trashTable->isElementInTable($itemName) ||
+            ($this->trashTable->isElementInTable($itemName) && $this->trashTable->getTableCellValue('Type', $itemName) !== $itemType);
+        $elementShouldExistString = $elementShouldExist ? 'n\'t' : '';
+
         Assert::assertFalse(
-            $this->isTrashEmpty() ||
-            !$this->adminList->table->isElementInTable($itemName) ||
-            ($this->adminList->table->isElementInTable($itemName) && $this->adminList->table->getTableCellValue('Type', $itemName) !== $itemType),
-            sprintf('Item %s %s is not in trash', $itemType, $itemName)
+            ($isElementInTrash == $elementShouldExist),
+            sprintf('Item %s %s is%s in trash', $itemType, $itemName, $elementShouldExistString)
         );
     }
 
